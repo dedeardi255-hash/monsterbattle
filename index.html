@@ -1,0 +1,1526 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monster Battle: Kisah Nabi Muhammad</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .welcome-screen h1 {
+            font-size: 48px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounce 1s infinite alternate;
+        }
+
+        .welcome-screen p {
+            font-size: 20px;
+            color: #f0f0f0;
+            margin-bottom: 40px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Character Selection */
+        .character-selection {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .selection-title {
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .players-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .player-section {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .player-section h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .monsters-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .monster-card {
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .monster-card:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.3);
+        }
+
+        .monster-card.selected {
+            border-color: #f5576c;
+            background: rgba(245,87,108,0.3);
+            transform: scale(1.05);
+        }
+
+        .monster-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .monster-name {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .team-name-input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 18px;
+            border: 3px solid rgba(255,255,255,0.4);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .team-name-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .team-name-input:focus {
+            outline: none;
+            border-color: #f5576c;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .ready-btn {
+            display: block;
+            margin: 30px auto 0;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 15px 60px;
+            font-size: 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .ready-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .ready-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Countdown Screen */
+        .countdown-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .countdown-title {
+            color: white;
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        .countdown-number {
+            font-size: 150px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+            animation: countdownPulse 1s ease-in-out infinite;
+            margin-bottom: 40px;
+        }
+
+        .countdown-fighters {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin-top: 30px;
+        }
+
+        .countdown-fighter {
+            text-align: center;
+        }
+
+        .countdown-monster {
+            font-size: 100px;
+            margin-bottom: 15px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .countdown-name {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .countdown-vs {
+            font-size: 60px;
+            color: #f5576c;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Battle Screen */
+        .battle-screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .split-screen {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .player-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-panel.player1 {
+            border: 3px solid rgba(67,233,123,0.5);
+        }
+
+        .player-panel.player2 {
+            border: 3px solid rgba(245,87,108,0.5);
+        }
+
+        .fighter {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .fighter-name {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .fighter-character {
+            position: relative;
+            display: inline-block;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .fighter.attacking .fighter-character {
+            animation: attackMove 0.6s ease-in-out;
+        }
+
+        .character-body {
+            font-size: 60px;
+            position: relative;
+            z-index: 2;
+            display: none;
+        }
+
+        .character-head {
+            font-size: 80px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .character-weapon {
+            font-size: 40px;
+            position: absolute;
+            top: 50px;
+            right: -35px;
+            z-index: 1;
+            animation: weaponSwing 2s ease-in-out infinite;
+        }
+
+        .player1 .character-weapon {
+            right: auto;
+            left: -35px;
+            transform: scaleX(-1);
+        }
+
+        .health-bar-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .health-bar {
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .score {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-container {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-number {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .answer-btn {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            border: 3px solid rgba(255,255,255,0.4);
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-2px);
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-btn.correct {
+            background: rgba(67,233,123,0.6);
+            border-color: #43e97b;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .answer-btn.wrong {
+            background: rgba(245,87,108,0.6);
+            border-color: #f5576c;
+            animation: wrongShake 0.5s ease;
+        }
+
+        /* Attack Effects */
+        .attack-effect {
+            position: absolute;
+            font-size: 50px;
+            pointer-events: none;
+            animation: attackEffect 1s ease-out forwards;
+            z-index: 100;
+        }
+
+        .fire-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            animation: fireBlast 0.8s ease-out forwards;
+            pointer-events: none;
+        }
+
+        .lightning-effect {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 50px;
+            animation: lightningStrike 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+
+        .ice-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            animation: iceFreeze 0.8s ease-out forwards;
+            pointer-events: none;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .result-title {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        .winner-monster {
+            font-size: 150px;
+            margin: 30px 0;
+            animation: victory 1s ease-in-out infinite;
+        }
+
+        .final-scores {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 500px;
+        }
+
+        .final-score-item {
+            color: white;
+            font-size: 24px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes attack {
+            0%, 100% { transform: translateX(0) scale(1) rotate(0deg); }
+            25% { transform: translateX(-10px) scale(1.1) rotate(-5deg); }
+            75% { transform: translateX(10px) scale(1.3) rotate(5deg); }
+        }
+
+        @keyframes attackMove {
+            0%, 100% { transform: translateX(0) scale(1) rotate(0deg); }
+            30% { transform: translateX(-15px) scale(1.1) rotate(-10deg); }
+            60% { transform: translateX(20px) scale(1.2) rotate(10deg); }
+        }
+
+        @keyframes weaponSwing {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(20deg); }
+        }
+
+        @keyframes countdownPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes victory {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(10deg); }
+        }
+
+        @keyframes attackEffect {
+            0% { 
+                opacity: 1; 
+                transform: translate(0, 0) scale(1);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(100px, -50px) scale(2);
+            }
+        }
+
+        @keyframes fireBlast {
+            0% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(0.5);
+                filter: brightness(2);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(2.5);
+                filter: brightness(0.5);
+            }
+        }
+
+        @keyframes lightningStrike {
+            0% { 
+                opacity: 1; 
+                transform: translateX(-50%) translateY(-100px);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateX(-50%) translateY(50px);
+            }
+        }
+
+        @keyframes iceFreeze {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(2) rotate(360deg);
+            }
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(67,233,123,0.8); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @media (max-width: 768px) {
+            .players-container,
+            .split-screen {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-screen h1 {
+                font-size: 32px;
+            }
+
+            .fighter-monster {
+                font-size: 60px;
+            }
+
+            .winner-monster {
+                font-size: 100px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .answer-btn {
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container"><!-- Welcome Screen -->
+   <div class="welcome-screen" id="welcomeScreen">
+    <h1 id="gameTitle">Monster Battle</h1>
+    <p id="gameSubtitle">Tema: Kisah Nabi Muhammad Saw.</p><button class="start-btn" id="startBtn">Mulai Permainan</button>
+   </div><!-- Character Selection -->
+   <div class="character-selection" id="characterSelection">
+    <h1 class="selection-title">Pilih Monstermu!</h1>
+    <div class="players-container">
+     <div class="player-section">
+      <h2>Pemain 1</h2>
+      <div style="margin-bottom: 20px;"><input type="text" id="player1Name" class="team-name-input" placeholder="Masukkan Nama Tim" maxlength="20">
+      </div>
+      <div class="monsters-grid" id="player1Monsters"></div>
+     </div>
+     <div class="player-section">
+      <h2>Pemain 2</h2>
+      <div style="margin-bottom: 20px;"><input type="text" id="player2Name" class="team-name-input" placeholder="Masukkan Nama Tim" maxlength="20">
+      </div>
+      <div class="monsters-grid" id="player2Monsters"></div>
+     </div>
+    </div><button class="ready-btn" id="readyBtn" disabled>Bertarung</button>
+   </div><!-- Countdown Screen -->
+   <div class="countdown-screen" id="countdownScreen">
+    <h1 class="countdown-title">Bersiap-siap!</h1>
+    <div class="countdown-number" id="countdownNumber">
+     5
+    </div>
+    <div class="countdown-fighters">
+     <div class="countdown-fighter">
+      <div class="countdown-monster" id="countdownMonster1"></div>
+      <div class="countdown-name" id="countdownName1"></div>
+     </div>
+     <div class="countdown-vs">
+      VS
+     </div>
+     <div class="countdown-fighter">
+      <div class="countdown-monster" id="countdownMonster2"></div>
+      <div class="countdown-name" id="countdownName2"></div>
+     </div>
+    </div>
+   </div><!-- Battle Screen -->
+   <div class="battle-screen" id="battleScreen">
+    <div class="split-screen"><!-- Player 1 Panel -->
+     <div class="player-panel player1">
+      <div class="fighter" id="fighter1">
+       <div class="fighter-name" id="fighter1Name">
+        Pemain 1
+       </div>
+       <div class="fighter-character">
+        <div class="character-head" id="fighter1Head"></div>
+        <div class="character-body" id="fighter1Body">
+         🧍
+        </div>
+        <div class="character-weapon" id="fighter1Weapon">
+         ⚔️
+        </div>
+       </div>
+       <div class="health-bar-container">
+        <div class="health-bar" id="health1"><span id="health1Text">100%</span>
+        </div>
+       </div>
+       <div class="score">
+        Skor: <span id="score1">0</span>
+       </div>
+      </div>
+      <div class="question-container">
+       <div class="question-number" id="questionNumber1">
+        Pertanyaan 1 dari 10
+       </div>
+       <div class="question-text" id="questionText1"></div>
+       <div class="answers-grid" id="answersGrid1"></div>
+      </div>
+     </div><!-- Player 2 Panel -->
+     <div class="player-panel player2">
+      <div class="fighter" id="fighter2">
+       <div class="fighter-name" id="fighter2Name">
+        Pemain 2
+       </div>
+       <div class="fighter-character">
+        <div class="character-head" id="fighter2Head"></div>
+        <div class="character-body" id="fighter2Body">
+         🧍
+        </div>
+        <div class="character-weapon" id="fighter2Weapon">
+         ⚔️
+        </div>
+       </div>
+       <div class="health-bar-container">
+        <div class="health-bar" id="health2"><span id="health2Text">100%</span>
+        </div>
+       </div>
+       <div class="score">
+        Skor: <span id="score2">0</span>
+       </div>
+      </div>
+      <div class="question-container">
+       <div class="question-number" id="questionNumber2">
+        Pertanyaan 1 dari 10
+       </div>
+       <div class="question-text" id="questionText2"></div>
+       <div class="answers-grid" id="answersGrid2"></div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Result Screen -->
+   <div class="result-screen" id="resultScreen">
+    <h1 class="result-title" id="resultTitle">Pemenang!</h1>
+    <div class="winner-monster" id="winnerMonster"></div>
+    <div class="final-scores">
+     <div class="final-score-item" id="finalScore1">
+      Pemain 1: 0 poin
+     </div>
+     <div class="final-score-item" id="finalScore2">
+      Pemain 2: 0 poin
+     </div>
+    </div><button class="restart-btn" id="restartBtn">Main Lagi</button>
+   </div>
+  </div>
+  <script>
+        const defaultConfig = {
+            game_title: "Monster Battle",
+            game_subtitle: "Tema: Kisah Nabi Muhammad Saw.",
+            start_button_text: "Mulai Permainan",
+            background_color: "#667eea",
+            secondary_surface_color: "#764ba2",
+            text_color: "#ffffff",
+            primary_action_color: "#f5576c",
+            secondary_action_color: "#43e97b"
+        };
+
+        const monsters = [
+            { icon: "🐉", name: "Naga Api" },
+            { icon: "🦁", name: "Singa Petir" },
+            { icon: "🐺", name: "Serigala Es" },
+            { icon: "🦅", name: "Elang Angin" },
+            { icon: "🐯", name: "Harimau Badai" },
+            { icon: "🦖", name: "Dinosaurus Batu" }
+        ];
+
+        const questions = [
+            // Tentang Nabi Muhammad - Dasar
+            {
+                question: "Siapa nama nabi terakhir yang diutus oleh Allah?",
+                answers: ["Nabi Muhammad", "Nabi Musa", "Nabi Isa", "Nabi Ibrahim"],
+                correct: 0
+            },
+            {
+                question: "Di kota mana Nabi Muhammad dilahirkan?",
+                answers: ["Makkah", "Madinah", "Jakarta", "Mesir"],
+                correct: 0
+            },
+            {
+                question: "Siapa nama ibu Nabi Muhammad?",
+                answers: ["Aminah", "Khadijah", "Aisyah", "Fatimah"],
+                correct: 0
+            },
+            {
+                question: "Siapa nama ayah Nabi Muhammad?",
+                answers: ["Abdullah", "Ali", "Umar", "Hamzah"],
+                correct: 0
+            },
+            {
+                question: "Apa julukan Nabi Muhammad yang berarti 'orang yang dapat dipercaya'?",
+                answers: ["Al-Amin", "Al-Hakim", "Al-Karim", "Al-Alim"],
+                correct: 0
+            },
+            // Sifat dan Akhlak
+            {
+                question: "Nabi Muhammad selalu bersikap...",
+                answers: ["Jujur", "Sombong", "Marah-marah", "Pelit"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad sangat sayang kepada...",
+                answers: ["Semua orang", "Orang kaya saja", "Orang dewasa saja", "Keluarganya saja"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad suka menolong orang yang...",
+                answers: ["Kesusahan", "Kaya", "Pintar", "Terkenal"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk...",
+                answers: ["Berbuat baik", "Berbohong", "Berkelahi", "Malas"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad selalu tersenyum dan...",
+                answers: ["Ramah", "Galak", "Cuek", "Jutek"],
+                correct: 0
+            },
+            // Keluarga
+            {
+                question: "Siapa nama istri pertama Nabi Muhammad?",
+                answers: ["Khadijah", "Aisyah", "Fatimah", "Maryam"],
+                correct: 0
+            },
+            {
+                question: "Siapa nama putri Nabi Muhammad yang paling terkenal?",
+                answers: ["Fatimah", "Maryam", "Aisyah", "Zainab"],
+                correct: 0
+            },
+            {
+                question: "Siapa paman Nabi Muhammad yang merawatnya saat remaja?",
+                answers: ["Abu Thalib", "Abu Bakar", "Umar", "Ali"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad sangat sayang kepada...",
+                answers: ["Anak-anak kecil", "Orang kaya", "Raja-raja", "Tentara"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk sayang kepada...",
+                answers: ["Orang tua", "Diri sendiri saja", "Teman saja", "Guru saja"],
+                correct: 0
+            },
+            // Wahyu dan Malaikat
+            {
+                question: "Di mana Nabi Muhammad menerima wahyu pertama?",
+                answers: ["Gua Hira", "Rumah", "Masjid", "Pasar"],
+                correct: 0
+            },
+            {
+                question: "Malaikat siapa yang membawa wahyu kepada Nabi Muhammad?",
+                answers: ["Malaikat Jibril", "Malaikat Mikail", "Malaikat Israfil", "Malaikat Ridwan"],
+                correct: 0
+            },
+            {
+                question: "Apa yang diajarkan Malaikat Jibril kepada Nabi Muhammad?",
+                answers: ["Membaca", "Menulis", "Berhitung", "Menggambar"],
+                correct: 0
+            },
+            {
+                question: "Kitab suci yang diturunkan kepada Nabi Muhammad adalah...",
+                answers: ["Al-Quran", "Injil", "Taurat", "Zabur"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk membaca...",
+                answers: ["Al-Quran", "Komik", "Majalah", "Koran"],
+                correct: 0
+            },
+            // Ibadah
+            {
+                question: "Berapa kali kita shalat dalam sehari seperti yang diajarkan Nabi?",
+                answers: ["5 kali", "3 kali", "7 kali", "10 kali"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk shalat di...",
+                answers: ["Masjid atau di rumah", "Di jalan", "Di pasar", "Di sekolah saja"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk berpuasa di bulan...",
+                answers: ["Ramadhan", "Syawal", "Muharram", "Rajab"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad pergi ke Ka'bah untuk...",
+                answers: ["Beribadah haji", "Berdagang", "Bermain", "Berlibur"],
+                correct: 0
+            },
+            {
+                question: "Sebelum makan, Nabi Muhammad mengajarkan kita membaca...",
+                answers: ["Bismillah", "Alhamdulillah", "Subhanallah", "Astaghfirullah"],
+                correct: 0
+            },
+            // Perjalanan
+            {
+                question: "Nabi Muhammad pindah dari Makkah ke kota...",
+                answers: ["Madinah", "Jakarta", "Mesir", "Arab"],
+                correct: 0
+            },
+            {
+                question: "Perjalanan Nabi Muhammad dari Makkah ke Madinah disebut...",
+                answers: ["Hijrah", "Haji", "Umrah", "Isra"],
+                correct: 0
+            },
+            {
+                question: "Siapa sahabat yang menemani Nabi Muhammad hijrah?",
+                answers: ["Abu Bakar", "Umar", "Utsman", "Ali"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad bersembunyi di gua saat hijrah. Nama guanya adalah...",
+                answers: ["Gua Tsur", "Gua Hira", "Gua Batu", "Gua Jepang"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad naik ke langit dalam peristiwa...",
+                answers: ["Isra Mi'raj", "Hijrah", "Haji", "Umrah"],
+                correct: 0
+            },
+            // Hewan dan Alam
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk sayang kepada...",
+                answers: ["Hewan dan tumbuhan", "Diri sendiri saja", "Mainan", "Uang"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad melarang kita untuk...",
+                answers: ["Menyakiti hewan", "Memberi makan hewan", "Memelihara hewan", "Menyayangi hewan"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad suka menanam...",
+                answers: ["Pohon", "Sampah", "Batu", "Pasir"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk menjaga...",
+                answers: ["Kebersihan", "Kekotoran", "Kemalasan", "Kemarahan"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad suka memberi makan kepada...",
+                answers: ["Kucing dan hewan lain", "Diri sendiri saja", "Orang kaya", "Raja"],
+                correct: 0
+            },
+            // Sahabat
+            {
+                question: "Teman-teman Nabi Muhammad disebut...",
+                answers: ["Sahabat", "Murid", "Kawan", "Teman"],
+                correct: 0
+            },
+            {
+                question: "Sahabat Nabi yang dijuluki Ash-Shiddiq (Yang Jujur) adalah...",
+                answers: ["Abu Bakar", "Umar", "Utsman", "Ali"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk ... kepada teman",
+                answers: ["Baik dan setia", "Jahat", "Curang", "Bohong"],
+                correct: 0
+            },
+            {
+                question: "Sahabat Nabi yang berani adalah...",
+                answers: ["Umar bin Khattab", "Abu Jahal", "Abu Lahab", "Firaun"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk ... teman yang kesusahan",
+                answers: ["Menolong", "Mengejek", "Membiarkan", "Menertawakan"],
+                correct: 0
+            },
+            // Masjid
+            {
+                question: "Nabi Muhammad membangun masjid pertama di...",
+                answers: ["Madinah", "Makkah", "Jakarta", "Mesir"],
+                correct: 0
+            },
+            {
+                question: "Masjid yang dibangun Nabi Muhammad bernama Masjid...",
+                answers: ["Nabawi", "Istiqlal", "Agung", "Raya"],
+                correct: 0
+            },
+            {
+                question: "Di masjid, Nabi Muhammad mengajarkan...",
+                answers: ["Agama Islam", "Berdagang", "Bermain", "Memasak"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk menjaga kebersihan...",
+                answers: ["Masjid", "Jalan kotor", "Tempat sampah", "Selokan"],
+                correct: 0
+            },
+            {
+                question: "Sebelum masuk masjid, kita harus...",
+                answers: ["Berwudhu dan bersih", "Kotor", "Berisik", "Berlari"],
+                correct: 0
+            },
+            // Akhlak Sehari-hari
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk bangun pagi dan...",
+                answers: ["Shalat Subuh", "Tidur lagi", "Main game", "Nonton TV"],
+                correct: 0
+            },
+            {
+                question: "Ketika bertemu teman, Nabi Muhammad mengajarkan kita untuk...",
+                answers: ["Mengucapkan salam", "Diam saja", "Lari", "Bersembunyi"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk... kepada orang tua",
+                answers: ["Hormat dan patuh", "Membantah", "Marah", "Cuek"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk berbagi dengan...",
+                answers: ["Orang yang membutuhkan", "Orang kaya", "Diri sendiri", "Tidak berbagi"],
+                correct: 0
+            },
+            {
+                question: "Nabi Muhammad mengajarkan kita untuk selalu...",
+                answers: ["Bersyukur", "Mengeluh", "Marah", "Sedih"],
+                correct: 0
+            }
+        ];
+
+        let gameState = {
+            player1Monster: null,
+            player2Monster: null,
+            player1Name: "Pemain 1",
+            player2Name: "Pemain 2",
+            currentQuestion: 0,
+            scores: [0, 0],
+            questionsAsked: [],
+            player1Questions: [],
+            player2Questions: [],
+            player1Answered: false,
+            player2Answered: false
+        };
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function initGame() {
+            document.getElementById('startBtn').addEventListener('click', showCharacterSelection);
+            document.getElementById('readyBtn').addEventListener('click', startBattle);
+            document.getElementById('restartBtn').addEventListener('click', restartGame);
+            
+            renderMonsterSelection();
+        }
+
+        function renderMonsterSelection() {
+            const player1Grid = document.getElementById('player1Monsters');
+            const player2Grid = document.getElementById('player2Monsters');
+            
+            player1Grid.innerHTML = '';
+            player2Grid.innerHTML = '';
+            
+            monsters.forEach((monster, index) => {
+                const card1 = createMonsterCard(monster, 1, index);
+                const card2 = createMonsterCard(monster, 2, index);
+                player1Grid.appendChild(card1);
+                player2Grid.appendChild(card2);
+            });
+        }
+
+        function createMonsterCard(monster, player, index) {
+            const card = document.createElement('div');
+            card.className = 'monster-card';
+            card.innerHTML = `
+                <div class="monster-icon">${monster.icon}</div>
+                <div class="monster-name">${monster.name}</div>
+            `;
+            
+            card.addEventListener('click', () => selectMonster(player, index, card));
+            return card;
+        }
+
+        function selectMonster(player, index, card) {
+            const gridId = player === 1 ? 'player1Monsters' : 'player2Monsters';
+            const grid = document.getElementById(gridId);
+            const cards = grid.querySelectorAll('.monster-card');
+            
+            cards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            
+            if (player === 1) {
+                gameState.player1Monster = monsters[index];
+            } else {
+                gameState.player2Monster = monsters[index];
+            }
+            
+            checkReadyButton();
+        }
+
+        function checkReadyButton() {
+            const readyBtn = document.getElementById('readyBtn');
+            if (gameState.player1Monster && gameState.player2Monster) {
+                readyBtn.disabled = false;
+            }
+        }
+
+        function showCharacterSelection() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        function startBattle() {
+            // Ambil nama tim
+            const name1 = document.getElementById('player1Name').value.trim();
+            const name2 = document.getElementById('player2Name').value.trim();
+            gameState.player1Name = name1 || "Pemain 1";
+            gameState.player2Name = name2 || "Pemain 2";
+            
+            document.getElementById('characterSelection').style.display = 'none';
+            document.getElementById('countdownScreen').style.display = 'block';
+            
+            // Setup countdown screen
+            document.getElementById('countdownMonster1').textContent = gameState.player1Monster.icon;
+            document.getElementById('countdownMonster2').textContent = gameState.player2Monster.icon;
+            document.getElementById('countdownName1').textContent = gameState.player1Name;
+            document.getElementById('countdownName2').textContent = gameState.player2Name;
+            
+            // Start countdown
+            let count = 5;
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.getElementById('countdownNumber').textContent = count;
+                } else {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdownScreen').style.display = 'none';
+                    document.getElementById('battleScreen').style.display = 'block';
+                    initializeBattle();
+                }
+            }, 1000);
+        }
+
+        function initializeBattle() {
+            // Setup karakter dengan kepala monster dan senjata
+            document.getElementById('fighter1Head').textContent = gameState.player1Monster.icon;
+            document.getElementById('fighter2Head').textContent = gameState.player2Monster.icon;
+            document.getElementById('fighter1Name').textContent = gameState.player1Name;
+            document.getElementById('fighter2Name').textContent = gameState.player2Name;
+            
+            // Pilih senjata berdasarkan monster
+            const weapons = {
+                '🐉': '🔥',
+                '🦁': '⚡',
+                '🐺': '❄️',
+                '🦅': '💨',
+                '🐯': '🌪️',
+                '🦖': '🪨'
+            };
+            
+            document.getElementById('fighter1Weapon').textContent = weapons[gameState.player1Monster.icon] || '⚔️';
+            document.getElementById('fighter2Weapon').textContent = weapons[gameState.player2Monster.icon] || '⚔️';
+            
+            // Soal yang sama untuk kedua pemain tapi urutan dan pilihan diacak
+            gameState.questionsAsked = shuffleArray([...questions]).slice(0, 10);
+            
+            // Acak urutan soal untuk player 1
+            gameState.player1Questions = gameState.questionsAsked.map(q => ({
+                ...q,
+                answers: shuffleArray([...q.answers]),
+                correctAnswer: q.answers[q.correct]
+            }));
+            
+            // Acak urutan soal untuk player 2 (urutan berbeda)
+            const shuffledOrder = shuffleArray([...Array(10).keys()]);
+            gameState.player2Questions = shuffledOrder.map(i => {
+                const q = gameState.questionsAsked[i];
+                return {
+                    ...q,
+                    answers: shuffleArray([...q.answers]),
+                    correctAnswer: q.answers[q.correct]
+                };
+            });
+            
+            gameState.currentQuestion = 0;
+            gameState.scores = [0, 0];
+            gameState.player1Answered = false;
+            gameState.player2Answered = false;
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (gameState.currentQuestion >= 10) {
+                // Langsung tampilkan hasil tanpa countdown
+                setTimeout(() => {
+                    document.getElementById('battleScreen').style.display = 'none';
+                    showResults();
+                }, 1000);
+                return;
+            }
+            
+            gameState.player1Answered = false;
+            gameState.player2Answered = false;
+            
+            // Player 1 Question
+            const q1 = gameState.player1Questions[gameState.currentQuestion];
+            document.getElementById('questionNumber1').textContent = `Pertanyaan ${gameState.currentQuestion + 1} dari 10`;
+            document.getElementById('questionText1').textContent = q1.question;
+            
+            const answersGrid1 = document.getElementById('answersGrid1');
+            answersGrid1.innerHTML = '';
+            
+            q1.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.addEventListener('click', () => checkAnswer(1, answer, btn, q1.correctAnswer));
+                answersGrid1.appendChild(btn);
+            });
+            
+            // Player 2 Question
+            const q2 = gameState.player2Questions[gameState.currentQuestion];
+            document.getElementById('questionNumber2').textContent = `Pertanyaan ${gameState.currentQuestion + 1} dari 10`;
+            document.getElementById('questionText2').textContent = q2.question;
+            
+            const answersGrid2 = document.getElementById('answersGrid2');
+            answersGrid2.innerHTML = '';
+            
+            q2.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.addEventListener('click', () => checkAnswer(2, answer, btn, q2.correctAnswer));
+                answersGrid2.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(player, selectedAnswer, btn, correctAnswer) {
+            // Cegah jawaban ganda
+            if (player === 1 && gameState.player1Answered) return;
+            if (player === 2 && gameState.player2Answered) return;
+            
+            const gridId = player === 1 ? 'answersGrid1' : 'answersGrid2';
+            const allButtons = document.getElementById(gridId).querySelectorAll('.answer-btn');
+            
+            allButtons.forEach(b => b.disabled = true);
+            
+            const isCorrect = selectedAnswer === correctAnswer;
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+                gameState.scores[player - 1]++;
+                updateScore();
+                // Serang lawan jika jawaban benar
+                const opponent = player === 1 ? 2 : 1;
+                performAttack(player, opponent);
+                createAttackEffect(player, opponent);
+            } else {
+                btn.classList.add('wrong');
+                // Highlight jawaban benar
+                allButtons.forEach(b => {
+                    if (b.textContent === correctAnswer) {
+                        b.classList.add('correct');
+                    }
+                });
+                // Tidak ada serangan jika salah
+            }
+            
+            if (player === 1) {
+                gameState.player1Answered = true;
+            } else {
+                gameState.player2Answered = true;
+            }
+            
+            // Cek apakah kedua pemain sudah menjawab
+            if (gameState.player1Answered && gameState.player2Answered) {
+                setTimeout(() => {
+                    gameState.currentQuestion++;
+                    showQuestion();
+                }, 2000);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score1').textContent = gameState.scores[0];
+            document.getElementById('score2').textContent = gameState.scores[1];
+        }
+
+        function createAttackEffect(attacker, defender) {
+            const attackerHead = document.getElementById(`fighter${attacker}Head`);
+            const monsterIcon = attackerHead.textContent;
+            
+            let effectEmoji = '💥';
+            let effectClass = 'attack-effect';
+            
+            // Pilih efek berdasarkan monster
+            if (monsterIcon === '🐉') {
+                effectEmoji = '🔥';
+                effectClass = 'fire-effect';
+            } else if (monsterIcon === '🦁') {
+                effectEmoji = '⚡';
+                effectClass = 'lightning-effect';
+            } else if (monsterIcon === '🐺') {
+                effectEmoji = '❄️';
+                effectClass = 'ice-effect';
+            } else if (monsterIcon === '🦅') {
+                effectEmoji = '💨';
+                effectClass = 'attack-effect';
+            } else if (monsterIcon === '🐯') {
+                effectEmoji = '🌪️';
+                effectClass = 'attack-effect';
+            }
+            
+            // Efek pada defender
+            const effect = document.createElement('div');
+            effect.className = effectClass;
+            effect.textContent = effectEmoji;
+            
+            const defenderFighter = document.getElementById(`fighter${defender}`);
+            defenderFighter.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+        }
+
+        function performAttack(attacker, defender) {
+            const attackerEl = document.getElementById(`fighter${attacker}`);
+            const defenderHealth = document.getElementById(`health${defender}`);
+            const defenderHealthText = document.getElementById(`health${defender}Text`);
+            
+            attackerEl.classList.add('attacking');
+            
+            setTimeout(() => {
+                attackerEl.classList.remove('attacking');
+                const currentWidth = parseInt(defenderHealth.style.width || '100');
+                const newWidth = Math.max(0, currentWidth - 10);
+                defenderHealth.style.width = newWidth + '%';
+                defenderHealthText.textContent = newWidth + '%';
+            }, 600);
+        }
+
+        function showResults() {
+            document.getElementById('resultScreen').style.display = 'block';
+            
+            const winner = gameState.scores[0] > gameState.scores[1] ? 1 : 
+                          gameState.scores[0] < gameState.scores[1] ? 2 : 0;
+            
+            if (winner === 0) {
+                document.getElementById('resultTitle').textContent = 'Seri!';
+                document.getElementById('winnerMonster').textContent = '🤝';
+            } else {
+                const winnerName = winner === 1 ? gameState.player1Name : gameState.player2Name;
+                document.getElementById('resultTitle').textContent = `${winnerName} Menang!`;
+                document.getElementById('winnerMonster').textContent = 
+                    winner === 1 ? gameState.player1Monster.icon : gameState.player2Monster.icon;
+            }
+            
+            document.getElementById('finalScore1').textContent = `${gameState.player1Name}: ${gameState.scores[0]} poin`;
+            document.getElementById('finalScore2').textContent = `${gameState.player2Name}: ${gameState.scores[1]} poin`;
+        }
+
+        function restartGame() {
+            gameState = {
+                player1Monster: null,
+                player2Monster: null,
+                player1Name: "Pemain 1",
+                player2Name: "Pemain 2",
+                currentQuestion: 0,
+                scores: [0, 0],
+                questionsAsked: [],
+                player1Questions: [],
+                player2Questions: [],
+                player1Answered: false,
+                player2Answered: false
+            };
+            
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('readyBtn').disabled = true;
+            
+            document.getElementById('health1').style.width = '100%';
+            document.getElementById('health2').style.width = '100%';
+            document.getElementById('health1Text').textContent = '100%';
+            document.getElementById('health2Text').textContent = '100%';
+            
+            document.getElementById('player1Name').value = '';
+            document.getElementById('player2Name').value = '';
+            
+            // Reset countdown title
+            document.getElementById('countdownTitle').textContent = 'Bersiap-siap!';
+            
+            renderMonsterSelection();
+        }
+
+        async function onConfigChange(config) {
+            document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('gameSubtitle').textContent = config.game_subtitle || defaultConfig.game_subtitle;
+            document.getElementById('startBtn').textContent = config.start_button_text || defaultConfig.start_button_text;
+            
+            const bgColor = config.background_color || defaultConfig.background_color;
+            const secondaryColor = config.secondary_surface_color || defaultConfig.secondary_surface_color;
+            document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${secondaryColor} 100%)`;
+            
+            const textColor = config.text_color || defaultConfig.text_color;
+            document.querySelectorAll('.welcome-screen h1, .welcome-screen p, .selection-title, .player-section h2, .monster-name, .fighter-name, .score, .question-text, .result-title, .final-score-item').forEach(el => {
+                el.style.color = textColor;
+            });
+            
+            const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+            document.querySelectorAll('.start-btn, .restart-btn').forEach(btn => {
+                btn.style.background = `linear-gradient(135deg, #f093fb 0%, ${primaryColor} 100%)`;
+            });
+            
+            const secondaryActionColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+            document.querySelectorAll('.ready-btn').forEach(btn => {
+                btn.style.background = `linear-gradient(135deg, ${secondaryActionColor} 0%, #38f9d7 100%)`;
+            });
+        }
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig: defaultConfig,
+                onConfigChange: onConfigChange,
+                mapToCapabilities: (config) => ({
+                    recolorables: [
+                        {
+                            get: () => config.background_color || defaultConfig.background_color,
+                            set: (value) => {
+                                config.background_color = value;
+                                window.elementSdk.setConfig({ background_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.secondary_surface_color || defaultConfig.secondary_surface_color,
+                            set: (value) => {
+                                config.secondary_surface_color = value;
+                                window.elementSdk.setConfig({ secondary_surface_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.text_color || defaultConfig.text_color,
+                            set: (value) => {
+                                config.text_color = value;
+                                window.elementSdk.setConfig({ text_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                            set: (value) => {
+                                config.primary_action_color = value;
+                                window.elementSdk.setConfig({ primary_action_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                            set: (value) => {
+                                config.secondary_action_color = value;
+                                window.elementSdk.setConfig({ secondary_action_color: value });
+                            }
+                        }
+                    ],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["game_title", config.game_title || defaultConfig.game_title],
+                    ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+                    ["start_button_text", config.start_button_text || defaultConfig.start_button_text]
+                ])
+            });
+        }
+
+        initGame();
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99ffb99f7152e9d3',t:'MTc2MzM4NzcxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
